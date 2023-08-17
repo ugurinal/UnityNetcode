@@ -5,23 +5,30 @@ namespace UnityNetcode.Player
 {
     public class NetcodePlayerEntity : NetworkBehaviour
     {
-        [SerializeField] private float moveSpeed;
+        [SerializeField] private float moveSpeed = 5f;
+        [SerializeField] private float rotationSpeed = 10f;
+        [SerializeField] private GameObject vCam;
+        [SerializeField] private CharacterController controller;
 
-        private Vector2 oldInput;
+        private float accumulatedRotation;
+        private Transform xform;
 
-        [SerializeField] private NetworkVariable<float> xInput = new NetworkVariable<float>();
-        [SerializeField] private NetworkVariable<float> zInput = new NetworkVariable<float>();
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            xform = GetComponent<Transform>();
 
-        private float oldXInput;
-        private float oldZInput;
-
-        private NetworkVariable<Vector2> moveInput = new NetworkVariable<Vector2>();
+            if (!IsOwner)
+            {
+                vCam.SetActive(false);
+            }
+        }
 
         private void Update()
         {
             if (IsServer)
             {
-                UpdateServer();
+                // UpdateServer();
             }
 
             if (IsClient && IsOwner)
@@ -30,41 +37,71 @@ namespace UnityNetcode.Player
             }
         }
 
-        private void UpdateServer()
-        {
-            ApplyMoveInput();
-        }
+        // private void UpdateServer()
+        // {
+        //     var moveDir = GetMoveInput();
+        //     var mouseDelta = GetMouseDelta();
+        //
+        //     Move(moveDir);
+        //     RotateCamera(mouseDelta);
+        // }
 
         private void UpdateClient()
         {
-            GetInput();
+            var moveDir = GetMoveInput();
+            var mouseDelta = GetMouseDelta();
+
+            MoveServerRPC(moveDir);
+            RotateServerRPC(mouseDelta);
         }
 
-        private void GetInput()
+        private void Move(Vector2 input)
         {
-            var input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+            var calcMove = input.x * xform.right + input.y * xform.forward;
+            var move = calcMove * (moveSpeed * Time.deltaTime);
 
-            if (input == oldInput)
+            controller.Move(move);
+        }
+
+        private void Rotate(Vector2 input)
+        {
+            if (input == Vector2.zero)
             {
                 return;
             }
 
-            oldInput = input;
-
-            UpdateInputVariableServerRpc(input);
-        }
-
-        private void ApplyMoveInput()
-        {
-            var moveDir = new Vector3(moveInput.Value.x, 0f, moveInput.Value.y).normalized;
-
-            transform.Translate(moveDir * (Time.deltaTime * moveSpeed));
+            xform.Rotate(new Vector3(0f, input.x * rotationSpeed, 0f));
         }
 
         [ServerRpc]
-        private void UpdateInputVariableServerRpc(Vector2 inputNetwork)
+        private void MoveServerRPC(Vector3 input)
         {
-            moveInput.Value = inputNetwork;
+            Move(input);
+        }
+
+        [ServerRpc]
+        private void RotateServerRPC(Vector2 input)
+        {
+            Rotate(input);
+        }
+
+        private Vector2 GetMoveInput()
+        {
+            var input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized;
+
+            return input;
+        }
+
+        private Vector2 GetMouseDelta()
+        {
+            if (!Input.GetMouseButton(1))
+            {
+                return Vector2.zero;
+            }
+
+            var input = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+
+            return input;
         }
     }
 }

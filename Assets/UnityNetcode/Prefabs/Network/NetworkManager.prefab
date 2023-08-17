@@ -76,7 +76,7 @@ Transform:
   m_Children:
   - {fileID: 257993223860619965}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1357078071879809243
 MonoBehaviour:
@@ -95,7 +95,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 441100093889242288}
-    PlayerPrefab: {fileID: 1852522126582404122, guid: b94486780b4daed44a4b47a11cf4dfcb,
+    PlayerPrefab: {fileID: 3938588256590373015, guid: 3798b615d6246cd49bfb0c11211ccc6a,
       type: 3}
     Prefabs:
       NetworkPrefabsLists:
