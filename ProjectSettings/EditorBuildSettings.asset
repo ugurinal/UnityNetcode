@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/UnityNetcode/Scenes/Netcode.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/UnityNetcode/Scenes/Main.unity
+    guid: ae7bfb308e5c67541b315ceab97d8972
   m_configObjects: {}
