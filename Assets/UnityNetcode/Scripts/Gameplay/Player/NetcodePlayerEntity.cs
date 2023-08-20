@@ -1,7 +1,7 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
 
-namespace UnityNetcode.Player
+namespace UnityNetcode.Gameplay.Player
 {
     public class NetcodePlayerEntity : NetworkBehaviour
     {
@@ -36,15 +36,6 @@ namespace UnityNetcode.Player
                 UpdateClient();
             }
         }
-
-        // private void UpdateServer()
-        // {
-        //     var moveDir = GetMoveInput();
-        //     var mouseDelta = GetMouseDelta();
-        //
-        //     Move(moveDir);
-        //     RotateCamera(mouseDelta);
-        // }
 
         private void UpdateClient()
         {

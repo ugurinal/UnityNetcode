@@ -167,3 +167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e41a3b301e4da942ba4bec8656db9ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sceneSystemParameters: {fileID: 11400000, guid: 19fc33fa1c0f00242a362e939ecdba39,
+    type: 2}
+  lobbySystemParameters: {fileID: 11400000, guid: 9337ab46faaa3d44aabdbf248e604be8,
+    type: 2}
