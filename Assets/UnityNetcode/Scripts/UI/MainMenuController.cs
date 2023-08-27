@@ -7,6 +7,8 @@ using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityNetcode.Commons.Init;
+using UnityNetcode.Gameplay.Player;
+using UnityNetcode.Utilities;
 
 namespace UnityNetcode.UI
 {
@@ -22,25 +24,19 @@ namespace UnityNetcode.UI
         [SerializeField] private Toggle isPrivate;
 
         [Header("Join Panel References")]
-        [SerializeField] private TMP_InputField ipAddress;
+        [SerializeField] private TMP_InputField lobbyCodeField;
 
         private ActivePanel activePanel;
 
-        private void Awake()
-        {
-            activePanel = ActivePanel.Initial;
-
-            initialPanel.SetActive(true);
-            hostPanel.SetActive(false);
-            joinPanel.SetActive(false);
-        }
-
         public async void CreateLobbyButtonClick()
         {
+            var playerData = new LobbyPlayerData(AuthenticationService.Instance.PlayerId, "HOST");
+            var player = new Player(playerData.ID, null, DataUtilities.SerializePlayerData(playerData.Serialize()));
+
             var lobbyOptions = new CreateLobbyOptions
             {
                 IsPrivate = isPrivate.isOn,
-                Player = new Player(AuthenticationService.Instance.PlayerId)
+                Player = player
             };
 
             var isSuccess = await GameSystems.LobbySystem.CreateLobby(lobbyName.text, maxPlayerDropdown.value + 1, lobbyOptions);
@@ -53,6 +49,38 @@ namespace UnityNetcode.UI
             GameSystems.SceneSystem.LoadLobbyScene();
         }
 
+        public async void JoinLobbyByCodeClick()
+        {
+            var playerData = new LobbyPlayerData(AuthenticationService.Instance.PlayerId, "CLIENT");
+            var player = new Player(playerData.ID, null, DataUtilities.SerializePlayerData(playerData.Serialize()));
+
+            var lobbyOptions = new JoinLobbyByCodeOptions()
+            {
+                Player = player
+            };
+
+
+            var isSuccess = await GameSystems.LobbySystem.JoinLobbyByCode(lobbyCodeField.text, lobbyOptions);
+
+            if (!isSuccess)
+            {
+                return;
+            }
+
+            GameSystems.SceneSystem.LoadLobbyScene();
+        }
+
+        #region UNITY_METHODS
+        private void Awake()
+        {
+            activePanel = ActivePanel.Initial;
+
+            initialPanel.SetActive(true);
+            hostPanel.SetActive(false);
+            joinPanel.SetActive(false);
+        }
+
+
         public void BackButtonClick()
         {
             activePanel = ActivePanel.Initial;
@@ -63,8 +91,6 @@ namespace UnityNetcode.UI
         {
             activePanel = ActivePanel.Host;
             OnPanelStateChanged();
-
-            // var created =GameSystems.LobbySystem.CreateLobby();
         }
 
         public void JoinButtonClick()
@@ -105,5 +131,6 @@ namespace UnityNetcode.UI
             Host,
             Join
         }
+        #endregion
     }
 }
